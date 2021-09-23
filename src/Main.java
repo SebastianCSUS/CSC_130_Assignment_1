@@ -3,26 +3,8 @@
  */
 public class Main {
     public static void main(String[] args){
-        System.out.print("TESTING LINKED LIST\r\n");
-        System.out.print("Expected List: 5, 10, Bean, 0\r\nActual List: ");
-
-        LinkedList testList = new LinkedList();
-        testList.addHead(10);
-        testList.addTail("Beam");
-        testList.addHead(5);
-        testList.removeTail();
-        testList.addTail("Bean");
-        testList.addTail(0);
-        testList.addHead("killme");
-        testList.removeHead();
-
-        Node index = testList.head;
-        while(index != testList.tail){
-            System.out.print(index.getValue() + ", ");
-            index = index.getNext();
-        }
-        System.out.print(index.getValue()+"\r\n");
-        System.out.print(testList.about()+"\r\n");
+        //Test.testLinkedList();
+        Test.testStack();
     }
 }
 
@@ -53,21 +35,20 @@ class Node {
 /** Doubly linked list
  *
  */
-//TODO: Fix this shit
 class LinkedList {
-    Node head; //First
-    Node tail; //Last
+    Node head;
+    Node tail;
 
     //Constructors
     public LinkedList(){
     }
-    public LinkedList(Node node) {
-        this.head = node;
-        this.tail = node;
+    public LinkedList(Object item) {
+        this.head = new Node(item);
+        this.tail = new Node(item);
     }
-    public LinkedList(Node head, Node tail){
-        this.head = head;
-        this.tail = tail;
+    public LinkedList(Object head, Object tail){
+        this.head = new Node(head);
+        this.tail = new Node(tail);
     }
 
     String about() {
@@ -106,7 +87,7 @@ class LinkedList {
         index = index.getNext();
         tail = index;
 
-        Node oldTail = tail.getNext();              //Delete reference to old Tail to remove from Heap
+        Object oldTail = tail.getNext();              //Delete reference to old Tail to remove from Heap
         tail.next = null;
 
         return oldTail;
@@ -116,5 +97,78 @@ class LinkedList {
             return null;
         }
         return head.getValue();
+    }
+}
+
+/** Stack class building off LinkedList
+ *      All nodes are added on top of the head (new node become the new head)
+ */
+class Stack {
+    LinkedList stack;
+
+    //Constructors
+    public Stack(){
+        this.stack = new LinkedList();
+    }
+    public Stack(Double item){
+        this.stack = new LinkedList(item);
+    }
+
+    String about() {
+        return "Author: Sebastian Jones";
+    }
+
+    void push(double item) {
+        stack.addHead(item);
+    }
+
+    double pop() {
+        return (double)((Node)stack.removeHead()).getValue();
+    }
+
+    double peek() {
+        return (double)stack.peekHead();
+    }
+
+    boolean isEmpty() {
+        return stack.head == null;
+    }
+}
+class Test {
+    static void testLinkedList() {
+        System.out.print("TESTING LINKED LIST\r\n");
+        System.out.print("Expected List: 5, 10, Bean, 0\r\nActual List: ");
+
+        LinkedList testList = new LinkedList();
+        testList.addHead(10);
+        testList.addTail("Beam");
+        testList.addHead(5);
+        testList.removeTail();
+        testList.addTail("Bean");
+        testList.addTail(0);
+        testList.addHead("killme");
+        testList.removeHead();
+
+        Node index = testList.head;
+        while(index != testList.tail){
+            System.out.print(index.getValue() + ", ");
+            index = index.getNext();
+        }
+        System.out.print(index.getValue()+"\r\n");
+        System.out.print(testList.about()+"\r\n");
+    }
+
+    static void testStack() {
+        System.out.print("TESTING STACK\r\n");
+        System.out.print("Expected Stack: \r\nActual Stack: ");
+
+        Stack testStack = new Stack();
+
+        testStack.push(0);
+        testStack.push(10);
+        testStack.push(8);
+        testStack.push(99);
+        testStack.pop();
+        System.out.print(testStack.peek());
     }
 }
