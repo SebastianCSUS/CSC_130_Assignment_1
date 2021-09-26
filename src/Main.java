@@ -3,8 +3,9 @@
  */
 public class Main {
     public static void main(String[] args){
-        //Test.testLinkedList();
+        Test.testLinkedList();
         Test.testStack();
+        Test.testQueue();
     }
 }
 
@@ -33,7 +34,7 @@ class Node {
 }
 
 /** Doubly linked list
- *
+ *      Keeps track of beginning and end of list for O(1) efficiency
  */
 class LinkedList {
     Node head;
@@ -44,64 +45,85 @@ class LinkedList {
     }
     public LinkedList(Object item) {
         this.head = new Node(item);
-        this.tail = new Node(item);
-    }
-    public LinkedList(Object head, Object tail){
-        this.head = new Node(head);
-        this.tail = new Node(tail);
     }
 
     String about() {
         return "Author: Sebastian Jones";
     }
     void addHead(Object item) {
-        if (peekHead() == null) {       //List is empty
+        if (peekHead() == null) {       //List is empty, make new head
             head = new Node(item);
-            tail = new Node(item);
+        } else if (tail == null){
+            tail = head;
+            head = new Node(item, tail);
         } else {
             head = new Node(item, head);
         }
     }
     void addTail(Object item) {
-        if (peekHead() == null) {       //List is empty
+        if (peekHead() == null) {       //List is empty, make new head instead of tail
             head = new Node(item);
+        } else if (head.getNext() == null) {
             tail = new Node(item);
+            head.next = tail;
         } else {
-            tail.next = new Node(item);
-            tail = tail.getNext();
+            Node newTail = new Node(item);
+            tail.next = newTail;
+            tail = newTail;
         }
     }
     Object removeHead() {
         Node oldHead = head;
 
-        head = head.getNext();
+        this.head = head.getNext();
 
-        return oldHead;
+        return oldHead.getValue();
     }
     Object removeTail() {
         Node index = head;
-
-        while(index.getNext().getNext() != null) {  //Can't go backwards so we gotta be two steps ahead
-            index = index.getNext();
+        if(index == null) {
+            return null;                 //TODO: ASK IF THIS IS CORRECT
         }
-        index = index.getNext();
+
+        while(index.getNext().getNext() != null) {  //Can't go backwards so we gotta be two steps ahead...
+            index = index.getNext();                //...because we'll be cutting the next one (current tail) out...
+        }                                           //...and setting the current index as the new tail
+
         tail = index;
 
-        Object oldTail = tail.getNext();              //Delete reference to old Tail to remove from Heap
-        tail.next = null;
+        Object oldTail = tail.getNext();
+        tail.next = null;                           //Delete reference to old Tail to remove from Heap
 
         return oldTail;
     }
+
     Object peekHead() {
         if(head == null) {
             return null;
         }
         return head.getValue();
     }
+
+    String outputToString() {
+        Node index = head;
+        String output = "";
+        StringBuilder sb = new StringBuilder();
+        if(index == null) {
+            return "Empty\r\n";
+        }
+        System.out.print("Head -> ");
+        while(index.getNext() != null) {
+            output = sb.append(index.getValue()).append(", ").toString();
+            index = index.getNext();
+        }
+        output += (index.getValue() + " <- Tail\r\n");
+
+        return output;
+    }
 }
 
-/** Stack class building off LinkedList
- *      All nodes are added on top of the head (new node become the new head)
+/** Stack - Self explanatory
+ *      Stack builds on head, removes off head
  */
 class Stack {
     LinkedList stack;
@@ -123,52 +145,153 @@ class Stack {
     }
 
     double pop() {
-        return (double)((Node)stack.removeHead()).getValue();
+        return (double)(stack.removeHead());
     }
 
     double peek() {
         return (double)stack.peekHead();
     }
 
+    void outputToString() {
+        String output = stack.outputToString();
+        System.out.print(output);
+    }
+
     boolean isEmpty() {
         return stack.head == null;
     }
 }
+
+/** Queue - Self explanatory
+ *      Builds on tail, removes off head
+ */
+class Queue {
+    LinkedList queue;
+
+    //Constructors
+    public Queue() {
+        this.queue = new LinkedList();
+    }
+    public Queue(String item) {
+        this.queue = new LinkedList(item);
+    }
+
+    String about() {
+        return "Author: Sebastian Jones";
+    }
+
+    void enqueue(String item) {
+        queue.addTail(item);
+    }
+
+    String dequeue() {
+        return (String)(queue.removeHead());
+    }
+
+    String peek() {
+        return (String)(queue.peekHead());
+    }
+
+    void outputToString() {
+        String output = queue.outputToString();
+        System.out.print(output);
+    }
+
+    boolean isEmpty() {
+        return queue.head == null;
+    }
+}
+
+/** Procedures to test other classes - disregard this
+ *      I could probably automate this for randomness but that's a lot of work - maybe later
+ *          I think this works for now
+ */
 class Test {
     static void testLinkedList() {
         System.out.print("TESTING LINKED LIST\r\n");
-        System.out.print("Expected List: 5, 10, Bean, 0\r\nActual List: ");
 
-        LinkedList testList = new LinkedList();
-        testList.addHead(10);
-        testList.addTail("Beam");
-        testList.addHead(5);
-        testList.removeTail();
-        testList.addTail("Bean");
-        testList.addTail(0);
-        testList.addHead("killme");
-        testList.removeHead();
-
-        Node index = testList.head;
-        while(index != testList.tail){
-            System.out.print(index.getValue() + ", ");
-            index = index.getNext();
-        }
-        System.out.print(index.getValue()+"\r\n");
-        System.out.print(testList.about()+"\r\n");
+        LinkedList testLinkedList = new LinkedList(1);
+        testLinkedList.removeHead();
+        System.out.print(testLinkedList.outputToString());
+        System.out.println("Adding tail:");
+        testLinkedList.addTail(2);
+        System.out.print(testLinkedList.outputToString());
+        System.out.println("Adding head:");
+        testLinkedList.addHead(5);
+        System.out.print(testLinkedList.outputToString());
+        System.out.println("Adding head:");
+        testLinkedList.addHead(7);
+        System.out.print(testLinkedList.outputToString());
+        System.out.println("Adding tail:");
+        testLinkedList.addTail(88);
+        System.out.print(testLinkedList.outputToString());
+        System.out.println("Adding tail:");
+        testLinkedList.addTail(9);
+        System.out.print(testLinkedList.outputToString());
+        System.out.println("Removing head:");
+        testLinkedList.removeHead();
+        System.out.print(testLinkedList.outputToString());
+        System.out.println("Removing tail:");
+        testLinkedList.removeTail();
+        System.out.print(testLinkedList.outputToString());
+        System.out.println("Peek: " + testLinkedList.peekHead());
+        System.out.print(testLinkedList.outputToString());
     }
 
     static void testStack() {
-        System.out.print("TESTING STACK\r\n");
-        System.out.print("Expected Stack: \r\nActual Stack: ");
+        System.out.print("\r\nTESTING STACK\r\n");
 
-        Stack testStack = new Stack();
-
-        testStack.push(0);
-        testStack.push(10);
-        testStack.push(8);
-        testStack.push(99);
+        Stack testStack = new Stack(42.0);
         testStack.pop();
-        System.out.print(testStack.peek());
+        testStack.outputToString();
+        System.out.println("Empty: " + testStack.isEmpty());
+        System.out.println("Adding value to the stack");
+        testStack.push(4.0);
+        testStack.outputToString();
+        System.out.println("Adding value to the stack");
+        testStack.push(2.0);
+        testStack.outputToString();
+        System.out.println("Adding value to the stack");
+        testStack.push(8.0);
+        testStack.outputToString();
+        System.out.println("Popping value from the stack");
+        testStack.pop();
+        testStack.outputToString();
+        System.out.println("Peek: " + testStack.peek());
+        testStack.outputToString();
+        System.out.println("Empty: " + testStack.isEmpty());
+    }
+
+    static void testQueue() {
+        System.out.print("\r\nTESTING QUEUE\r\n");
+
+        Queue testQueue = new Queue("Killme");
+        testQueue.dequeue();
+        testQueue.outputToString();
+        System.out.println("Empty: " + testQueue.isEmpty());
+        System.out.println("Enqueueing item");
+        testQueue.enqueue("First");
+        testQueue.outputToString();
+        System.out.println("Enqueueing item");
+        testQueue.enqueue("Second");
+        testQueue.outputToString();
+        System.out.println("Enqueueing item");
+        testQueue.enqueue("Third");
+        testQueue.outputToString();
+        System.out.println("Dequeueing item");
+        testQueue.dequeue();
+        testQueue.outputToString();
+        System.out.println("Dequeueing item");
+        testQueue.dequeue();
+        testQueue.outputToString();
+        System.out.println("Enqueueing item");
+        testQueue.enqueue("Fourth");
+        testQueue.outputToString();
+        testQueue.enqueue("Last");
+        System.out.println("Enqueueing item");
+        testQueue.outputToString();
+        System.out.println("Peek: " + testQueue.peek());
+        testQueue.outputToString();
+        System.out.println("Empty: " + testQueue.isEmpty());
     }
 }
