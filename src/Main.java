@@ -3,9 +3,10 @@
  */
 public class Main {
     public static void main(String[] args){
-        Test.testLinkedList();
-        Test.testStack();
-        Test.testQueue();
+        //Test.testLinkedList();
+        //Test.testStack();
+        //Test.testQueue();
+        LinkedList test = new LinkedList();
     }
 }
 
@@ -17,6 +18,8 @@ class Node {
     Node next;
 
     //Constructors
+    public Node(){
+    }
     public Node(Object value) {
         this.value = value;
     }
@@ -39,9 +42,18 @@ class Node {
 class LinkedList {
     Node head;
     Node tail;
+    Node pool = new Node();
+    Integer poolSize = 0;
 
     //Constructors
     public LinkedList(){
+        Node poolIndex = pool;
+        for(int i = 1; i < 10; i++) {
+            poolIndex.next = new Node(i);
+            System.out.println("Created pool node: " + i);
+            poolIndex = poolIndex.next;
+        }
+        System.out.println("Current node is " + pool.value + ". Next node is " + pool.next.value);
     }
     public LinkedList(Object item) {
         this.head = new Node(item);
@@ -74,15 +86,16 @@ class LinkedList {
     }
     Object removeHead() {
         Node oldHead = head;
-
         this.head = head.getNext();
-
         return oldHead.getValue();
     }
     Object removeTail() {
         Node index = head;
         if(index == null) {
-            return null;                 //TODO: ASK IF THIS IS CORRECT
+            return null;                                    //TODO: ASK IF THIS IS CORRECT
+        } else if(index.getNext() == null) {
+            removeHead();
+            return null;
         }
 
         while(index.getNext().getNext() != null) {  //Can't go backwards so we gotta be two steps ahead...
