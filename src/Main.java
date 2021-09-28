@@ -89,26 +89,6 @@ class LinkedList {
         this.head = head.getNext();
         return oldHead.getValue();
     }
-    Object removeTail() {
-        Node index = head;
-        if(index == null) {
-            return null;                                    //TODO: ASK IF THIS IS CORRECT
-        } else if(index.getNext() == null) {
-            removeHead();
-            return null;
-        }
-
-        while(index.getNext().getNext() != null) {  //Can't go backwards so we gotta be two steps ahead...
-            index = index.getNext();                //...because we'll be cutting the next one (current tail) out...
-        }                                           //...and setting the current index as the new tail
-
-        tail = index;
-
-        Object oldTail = tail.getNext();
-        tail.next = null;                           //Delete reference to old Tail to remove from Heap
-
-        return oldTail;
-    }
 
     Object peekHead() {
         if(head == null) {
@@ -243,9 +223,6 @@ class Test {
         System.out.print(testLinkedList.outputToString());
         System.out.println("Removing head:");
         testLinkedList.removeHead();
-        System.out.print(testLinkedList.outputToString());
-        System.out.println("Removing tail:");
-        testLinkedList.removeTail();
         System.out.print(testLinkedList.outputToString());
         System.out.println("Peek: " + testLinkedList.peekHead());
         System.out.print(testLinkedList.outputToString());
