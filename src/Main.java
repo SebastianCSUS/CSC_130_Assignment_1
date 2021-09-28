@@ -3,10 +3,9 @@
  */
 public class Main {
     public static void main(String[] args){
-        //Test.testLinkedList();
-        //Test.testStack();
-        //Test.testQueue();
-        LinkedList test = new LinkedList();
+        Test.testLinkedList();
+        Test.testStack();
+        Test.testQueue();
     }
 }
 
@@ -14,8 +13,8 @@ public class Main {
  *      Stores an indiscriminate variable and the next node in the chain/list/array.
  */
 class Node {
-    Object value;
-    Node next;
+    private Object value;
+    private Node next;
 
     //Constructors
     public Node(){
@@ -34,60 +33,114 @@ class Node {
     public Node getNext() {
         return this.next;
     }
+
+    public void setValue(Object value) {
+        this.value = value;
+    }
+
+    public void setNext(Node next) {
+        this.next = next;
+    }
 }
 
 /** Doubly linked list
  *      Keeps track of beginning and end of list for O(1) efficiency
  */
 class LinkedList {
-    Node head;
-    Node tail;
-    Node pool = new Node();
-    Integer poolSize = 0;
+    private Node head;
+    private Node tail;
+    private Node pool = new Node();
+    private Integer poolSize = 1;
+    final Integer poolMax = 10;
 
     //Constructors
     public LinkedList(){
         Node poolIndex = pool;
-        for(int i = 1; i < 10; i++) {
-            poolIndex.next = new Node(i);
-            System.out.println("Created pool node: " + i);
-            poolIndex = poolIndex.next;
+        for(int i = 1; i < 10; i++) {                       //starts at 1 because there is already a node made...
+            poolIndex.setNext(new Node(i));                   //...before the constructor runs
+            poolIndex = poolIndex.getNext();
+            poolSize = i;
         }
-        System.out.println("Current node is " + pool.value + ". Next node is " + pool.next.value);
     }
     public LinkedList(Object item) {
-        this.head = new Node(item);
+        Node poolIndex = pool;
+        for(int i = 1; i < 10; i++) {                       //starts at 1 because there is already a node made...
+            poolIndex.setNext(new Node(i));                   //...before the constructor runs
+            poolIndex = poolIndex.getNext();
+            poolSize = i;
+        }
+        this.addHead(item);
     }
 
     String about() {
         return "Author: Sebastian Jones";
     }
     void addHead(Object item) {
-        if (peekHead() == null) {       //List is empty, make new head
-            head = new Node(item);
-        } else if (tail == null){
+        Node node = removePool();
+        node.setValue(item);
+
+        if (peekHead() == null) {               //List is empty, make new head
+            head = node;
+            head.setNext(null);
+        } else if (tail == null){               //Only one item in list
             tail = head;
-            head = new Node(item, tail);
+            head = node;
+            head.setNext(tail);
         } else {
-            head = new Node(item, head);
+            Node oldHead = head;                //Not needed but helps readability
+            head = node;
+            head.setNext(oldHead);
         }
     }
     void addTail(Object item) {
-        if (peekHead() == null) {       //List is empty, make new head instead of tail
-            head = new Node(item);
-        } else if (head.getNext() == null) {
-            tail = new Node(item);
-            head.next = tail;
+        Node node = removePool();
+        node.setValue(item);
+        node.setNext(null);
+
+        if (peekHead() == null) {               //List is empty
+            head = node;
+        } else if (head.getNext() == null) {    //No tail (one item in list)
+            tail = node;
+            head.setNext(tail);
         } else {
-            Node newTail = new Node(item);
-            tail.next = newTail;
-            tail = newTail;
+            tail.setNext(node);
+            tail = node;
         }
     }
     Object removeHead() {
         Node oldHead = head;
-        this.head = head.getNext();
-        return oldHead.getValue();
+        Object returnValue = oldHead.getValue();
+
+        head = head.getNext();
+        addPool(oldHead);
+
+        return returnValue;
+    }
+
+    void addPool(Node add) {
+        add.setValue((Integer)pool.getValue() - 1);
+        if(poolSize < poolMax) {
+            add.setNext(pool);
+            pool = add;
+            poolSize++;
+            System.out.println("Added node " + pool.getValue() +" to pool");
+            return;
+        }
+        System.out.println("Pool at max size");
+    }
+
+    Node removePool() {
+        if(poolSize == 0) {
+            return new Node();
+        }
+        else {
+            Node returnNode = pool;
+            System.out.println("Removed node " + pool.getValue() + " from pool");
+            pool = pool.getNext();
+            poolSize--;
+            return returnNode;
+        }
+
     }
 
     Object peekHead() {
@@ -151,7 +204,7 @@ class Stack {
     }
 
     boolean isEmpty() {
-        return stack.head == null;
+        return stack.peekHead() == null;
     }
 }
 
@@ -191,7 +244,7 @@ class Queue {
     }
 
     boolean isEmpty() {
-        return queue.head == null;
+        return queue.peekHead() == null;
     }
 }
 
