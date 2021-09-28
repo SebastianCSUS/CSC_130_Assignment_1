@@ -6,6 +6,7 @@ public class Main {
         Test.testLinkedList();
         Test.testStack();
         Test.testQueue();
+        Test.testPool();
     }
 }
 
@@ -49,23 +50,23 @@ class Node {
 class LinkedList {
     private Node head;
     private Node tail;
-    private Node pool = new Node();
+    private Node pool = new Node(0);            //TODO: Remove value assignment after testing
     private Integer poolSize = 1;
-    final Integer poolMax = 10;
+    final Integer poolMax = 9;
 
     //Constructors
     public LinkedList(){
         Node poolIndex = pool;
         for(int i = 1; i < 10; i++) {                       //starts at 1 because there is already a node made...
-            poolIndex.setNext(new Node(i));                   //...before the constructor runs
+            poolIndex.setNext(new Node(i));                   //TODO: Remove value assignment after testing
             poolIndex = poolIndex.getNext();
-            poolSize = i;
+            poolSize++;
         }
     }
     public LinkedList(Object item) {
         Node poolIndex = pool;
-        for(int i = 1; i < 10; i++) {                       //starts at 1 because there is already a node made...
-            poolIndex.setNext(new Node(i));                   //...before the constructor runs
+        for(int i = 1; i <= 10; i++) {                       //starts at 1 because there is already a node made...
+            poolIndex.setNext(new Node(i));                   //TODO: Remove value assignment after testing
             poolIndex = poolIndex.getNext();
             poolSize = i;
         }
@@ -108,6 +109,9 @@ class LinkedList {
         }
     }
     Object removeHead() {
+        if(head == null) {
+            return null;
+        }
         Node oldHead = head;
         Object returnValue = oldHead.getValue();
 
@@ -118,24 +122,31 @@ class LinkedList {
     }
 
     void addPool(Node add) {
-        add.setValue((Integer)pool.getValue() - 1);
-        if(poolSize < poolMax) {
+        if(poolSize <= poolMax) {
+            if(pool == null) {                          //TODO: Replace if/else statement with making value null after testing
+                add.setValue(9);
+            } else {
+                add.setValue((Integer) pool.getValue() - 1);
+            }
             add.setNext(pool);
             pool = add;
             poolSize++;
-            System.out.println("Added node " + pool.getValue() +" to pool");
+            System.out.println("Added node " + pool.getValue() +" to pool");        //TODO: Remove after testing
             return;
         }
-        System.out.println("Pool at max size");
+        add.setNext(null);
+        add.setValue(null);
+        System.out.println("Pool at maximum capacity - feeding node to garbage collector");     //TODO: Remove after testing
     }
 
     Node removePool() {
         if(poolSize == 0) {
+            System.out.println("Pool exhausted - making new node");             //TODO: Remove after testing
             return new Node();
         }
         else {
             Node returnNode = pool;
-            System.out.println("Removed node " + pool.getValue() + " from pool");
+            System.out.println("Removed node " + pool.getValue() + " from pool");       //TODO: Remove after testing
             pool = pool.getNext();
             poolSize--;
             return returnNode;
@@ -155,7 +166,7 @@ class LinkedList {
         String output = "";
         StringBuilder sb = new StringBuilder();
         if(index == null) {
-            return "Empty\r\n";
+            return "List is empty\r\n";
         }
         System.out.print("Head -> ");
         while(index.getNext() != null) {
@@ -190,8 +201,8 @@ class Stack {
         stack.addHead(item);
     }
 
-    double pop() {
-        return (double)(stack.removeHead());
+    Double pop() {
+        return (Double)stack.removeHead();
     }
 
     double peek() {
@@ -255,26 +266,28 @@ class Queue {
 class Test {
     static void testLinkedList() {
         System.out.print("TESTING LINKED LIST\r\n");
+        LinkedList testLinkedList = new LinkedList();
+        System.out.println(testLinkedList.about());
+        System.out.println("--------------------------------");
 
-        LinkedList testLinkedList = new LinkedList(1);
         testLinkedList.removeHead();
         System.out.print(testLinkedList.outputToString());
-        System.out.println("Adding tail:");
+        System.out.println("Adding tail...");
         testLinkedList.addTail(2);
         System.out.print(testLinkedList.outputToString());
-        System.out.println("Adding head:");
+        System.out.println("Adding head...");
         testLinkedList.addHead(5);
         System.out.print(testLinkedList.outputToString());
-        System.out.println("Adding head:");
+        System.out.println("Adding head...");
         testLinkedList.addHead(7);
         System.out.print(testLinkedList.outputToString());
-        System.out.println("Adding tail:");
+        System.out.println("Adding tail...");
         testLinkedList.addTail(88);
         System.out.print(testLinkedList.outputToString());
-        System.out.println("Adding tail:");
+        System.out.println("Adding tail...");
         testLinkedList.addTail(9);
         System.out.print(testLinkedList.outputToString());
-        System.out.println("Removing head:");
+        System.out.println("Removing head...");
         testLinkedList.removeHead();
         System.out.print(testLinkedList.outputToString());
         System.out.println("Peek: " + testLinkedList.peekHead());
@@ -283,21 +296,23 @@ class Test {
 
     static void testStack() {
         System.out.print("\r\nTESTING STACK\r\n");
+        Stack testStack = new Stack();
+        System.out.println(testStack.about());
+        System.out.println("--------------------------------");
 
-        Stack testStack = new Stack(42.0);
         testStack.pop();
         testStack.outputToString();
         System.out.println("Empty: " + testStack.isEmpty());
-        System.out.println("Adding value to the stack");
+        System.out.println("Adding value to the stack...");
         testStack.push(4.0);
         testStack.outputToString();
-        System.out.println("Adding value to the stack");
+        System.out.println("Adding value to the stack...");
         testStack.push(2.0);
         testStack.outputToString();
-        System.out.println("Adding value to the stack");
+        System.out.println("Adding value to the stack...");
         testStack.push(8.0);
         testStack.outputToString();
-        System.out.println("Popping value from the stack");
+        System.out.println("Popping value from the stack...");
         testStack.pop();
         testStack.outputToString();
         System.out.println("Peek: " + testStack.peek());
@@ -307,34 +322,50 @@ class Test {
 
     static void testQueue() {
         System.out.print("\r\nTESTING QUEUE\r\n");
+        Queue testQueue = new Queue();
+        System.out.println(testQueue.about());
+        System.out.println("--------------------------------");
 
-        Queue testQueue = new Queue("Killme");
         testQueue.dequeue();
         testQueue.outputToString();
         System.out.println("Empty: " + testQueue.isEmpty());
-        System.out.println("Enqueueing item");
+        System.out.println("Enqueueing item...");
         testQueue.enqueue("First");
         testQueue.outputToString();
-        System.out.println("Enqueueing item");
+        System.out.println("Enqueueing item...");
         testQueue.enqueue("Second");
         testQueue.outputToString();
-        System.out.println("Enqueueing item");
+        System.out.println("Enqueueing item...");
         testQueue.enqueue("Third");
         testQueue.outputToString();
-        System.out.println("Dequeueing item");
+        System.out.println("Dequeueing item...");
         testQueue.dequeue();
         testQueue.outputToString();
-        System.out.println("Dequeueing item");
+        System.out.println("Dequeueing item...");
         testQueue.dequeue();
         testQueue.outputToString();
-        System.out.println("Enqueueing item");
+        System.out.println("Enqueueing item...");
         testQueue.enqueue("Fourth");
         testQueue.outputToString();
+        System.out.println("Enqueueing item...");
         testQueue.enqueue("Last");
-        System.out.println("Enqueueing item");
         testQueue.outputToString();
         System.out.println("Peek: " + testQueue.peek());
         testQueue.outputToString();
         System.out.println("Empty: " + testQueue.isEmpty());
+    }
+    static void testPool() {
+        System.out.println("\r\nTESTING POOL (Pool maximum size is 10 items)");
+        System.out.println("--------------------------------");
+
+        LinkedList testPool = new LinkedList();
+        System.out.println("Exhausting pool...");
+        for (int i = 0; i <= 11; i++) {
+            testPool.addHead(i);
+        }
+        System.out.println("Overloading pool...");
+        for (int i = 11; i >= 0; i--) {
+            testPool.removeHead();
+        }
     }
 }
